@@ -5,7 +5,7 @@ Script Python que extrae los BPM de las canciones en la base de datos de Virtual
 
 ## Uso:
 
-'python main.py --database x://VirtualDJ Local Database v6.xml -s 100-t 10 -p'
+`python main.py --database x://VirtualDJ Local Database v6.xml -s 100-t 10 -p`
 
     --database -d:  Especifica la ruta al XMl con la base de datos de VirtualDJ
     --start -s:     [>0] El track desde el cual se comienza a analizar
