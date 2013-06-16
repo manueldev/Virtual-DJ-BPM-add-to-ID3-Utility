@@ -3,7 +3,7 @@ Virtual-DJ-BPM-add-to-ID3-Utility
 
 Script Python que extrae los BPM de las canciones en la base de datos de Virtual DJ, guardándolos en el campo BPM de Id3tag del archivo MP3.
 
-Python script that extracts the BPM of the songs in the database Virtual DJstoring them in the BPM field ID3Tag MP3 file.
+Python script that extracts the BPM of the songs in the database Virtual DJ, storing them in the BPM field ID3Tag MP3 file.
 
 ## Uso:
 
