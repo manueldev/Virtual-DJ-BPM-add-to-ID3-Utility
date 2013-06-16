@@ -1,43 +1,44 @@
-# -*- coding: cp1252 -*-
 import sys
 from xml.sax import ContentHandler
 from xml.sax import make_parser
 import eyeD3   
+import getopt
 
 reload(sys)
-sys.setdefaultencoding("cp1252")
 
 class MuestraBpmManejador(ContentHandler):
     #Se llama al empezar a parsear
     def __init__(self):
-        self.cant = 100000
-        self.indice = -1
+        self.indice = 0
         self.titulo = ""
         self.bpmVdj = "0"
         self.bpmTag = "0"
         self.esMp3 = 0
+        self.contadorErrorGeneral = 0
+        self.errno2Archivos = 0
+        self.errno13Archivos = 0
+        self.start = 0
+        self.tracks = 0
  
     #Se llama al encontrar una etiqueta de inicio de elemento <elemento>
     def startElement(self, name, attrs):
-        #Entramos en Song
-        if name == 'Song' and self.indice < self.cant:
-            #Se guarda variable sobre si song es mp3
-            self.esMp3 = attrs.get('FilePath').count("mp3")
-            #Se guarda variable con ruta del mp3
-            self.titulo = attrs.get('FilePath')
-            print "\n" + self.titulo.encode("cp1252")
-        #Entramos en BPM de Song, solo si el indice es menor que la cantidad predefinida y si es mp3
-        if name == 'BPM' and self.indice < self.cant and self.esMp3 > 0:
-            #El indice aumenta
-            self.indice =  self.indice + 1
-            if attrs.get('Bpm'):
-                #Se guarda el bpm de VDJ solo si ya existia
-                self.bpmVdj = "{0:.4f}".format(round(44100 / float(attrs.get('Bpm')) * 60, 4))
-                                    
+            #Entramos en Song
+            if name == 'Song' and self.indice < self.tracks:
+                #Se guarda variable sobre si song es mp3
+                self.esMp3 = attrs.get('FilePath').count("mp3")
+                #Se guarda variable con ruta del mp3
+                self.titulo = attrs.get('FilePath')
+                print "\n" + self.titulo.encode('cp850','replace')
+            #Entramos en BPM de Song, solo si el indice es menor que la cantidad predefinida y si es mp3
+            if name == 'BPM' and self.indice < self.tracks and self.esMp3 > 0:
+                if attrs.get('Bpm'):
+                    #Se guarda el bpm de VDJ solo si ya existia
+                    self.bpmVdj = "{0:.4f}".format(round(44100 / float(attrs.get('Bpm')) * 60, 4))
+                                        
     def endElement(self, name):
         #Salimos del elemento song
         try:
-            if name == 'Song' and self.indice < self.cant and self.esMp3 > 0:
+            if name == 'Song' and self.indice < self.tracks and self.esMp3 > 0:
                 
                 print "BPM VDJ " + (self.bpmVdj).rjust(17)
                 #a leer el tag
@@ -74,19 +75,73 @@ class MuestraBpmManejador(ContentHandler):
                             print "BPM OK: " + "{0:.4f}".format(tag.getBPM()).rjust(17)
                 else:
                     print "NO HAY BPMVDJ, NO SE GUARDA NADA"
+                #El indice aumenta
+                self.indice += 1
                         
                 #limpiar variables
                 self.titulo = ""
                 self.bpmVdj = "0"
                 self.bpmTag = 0
                 self.esMp3 = 0
+        except IOError, e:
+            if e.errno == 2:
+                print "ERROR: El archivo no se encuentra en la ruta:\n" + self.titulo.encode('cp850','replace')
+            elif e.errno == 13:
+                print "ERROR: Se denegaron permisos para escribir en el archivo:\n" + self.titulo.encode('cp850','replace')
+            else:
+                raise e
         except Exception, e:
             print "ERROR " + str(e)
             raise e
+    def setInicio(self,nStart):
+        self.start = nStart
+    def setTracks(self,nTracks):
+        self.tracks = nTracks
 
-parser = make_parser()
-handler=MuestraBpmManejador()
-parser.setContentHandler(handler)
+def usage():
+    print "Uso:\n--database: Especifica la ruta al XMl con la base de datos de VirtualDJ\n--start: El track desde el cual se comienza a analizar\n--tracks: Cantidad de tracks a analizar"
+
+def main(argv):
+    try:
+        db = ''
+        start = 1
+        tracks = 1000
+
+        opts, args = getopt.getopt(argv, "d:s:t:", ["database=", "start=", "tracks="])
+        
+        if len(opts) == 0:
+            raise Exception("No se han ingresado argumentos validos")
+
+        for opt, arg in opts:
+            if opt in ("-d", "--database"):
+                db = arg
+            elif opt in ("-s", "--start"):
+                start = int(arg)
+            elif opt in ("-t", "--tracks"):
+                tracks = int(arg)
+        print "Analizando base de datos ubicada en: " + db
+        print "Desde el track numero: " + str(start)
+        print "Tracks a analizar: " + str(tracks)
+
+        parser = make_parser()
+        handler = MuestraBpmManejador()
+        handler.setInicio(start)
+        handler.setTracks(tracks)
+        parser.setContentHandler(handler)
+        
+        #Parseamos el fichero
+        parser.parse(db)
+
+    except getopt.GetoptError:
+        print "Error: No se han ingresado argumentos validos\n"
+        usage()
+    except ValueError:
+        print "Error: No se han ingresado argumentos validos\n"
+        usage()
+    except Exception, e:
+        print "Error: " + e.args[0] + "\n"
+        usage()
+
 tag = eyeD3.Tag()
-#Parseamos el fichero
-parser.parse("D:\VirtualDJ Local Database v6.xml")
+if __name__ == "__main__":
+    main(sys.argv[1:])
