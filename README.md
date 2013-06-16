@@ -5,6 +5,12 @@ Script Python que extrae los BPM de las canciones en la base de datos de Virtual
 
 Python script that extracts the BPM of the songs in the database Virtual DJ, storing them in the BPM field ID3Tag MP3 file.
 
+### Requiere:
+
+eyeD3 (usar https://github.com/manueldev/eyeD3-pip-0.6.19-mod-bpm )
+`python setup.py install`
+
+
 ## Uso:
 
 `python main.py --database "x://VirtualDJ Local Database v6.xml" -s 100-t 10 -p`
