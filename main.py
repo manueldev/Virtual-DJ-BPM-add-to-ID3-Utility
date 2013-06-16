@@ -133,7 +133,7 @@ class MuestraBpmManejador(ContentHandler):
 
 
 def usage():
-    print "Uso:\n\t--database -d:\tEspecifica la ruta al XMl con la base de datos de VirtualDJ\n\t--start -s:\tEl track desde el cual se comienza a analizar\n\t--tracks -t:\tCantidad de tracks a analizar"
+    print "Uso:\n\t--database -d:\tEspecifica la ruta al XMl con la base de datos de VirtualDJ\n\t--start -s:\tEl track desde el cual se comienza a analizar\n\t--tracks -t:\tCantidad de tracks a analizar\n\t--partyMode -p:\tActiva el modo debug"
 
 def main(argv):
     try:
