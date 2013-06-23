@@ -5,7 +5,7 @@ import eyeD3
 import getopt
 
 reload(sys)
-
+tag = eyeD3.Tag()
 class MuestraBpmManejador(ContentHandler):
     #Se llama al empezar a parsear
     def __init__(self):
@@ -136,6 +136,7 @@ def usage():
     print "Uso:\n\t--database -d:\tEspecifica la ruta al XMl con la base de datos de VirtualDJ\n\t--start -s:\tEl track desde el cual se comienza a analizar\n\t--tracks -t:\tCantidad de tracks a analizar\n\t--partyMode -p:\tActiva el modo debug"
 
 def main(argv):
+    
     try:
         db = ''
         start = 1
@@ -180,6 +181,6 @@ def main(argv):
         print "Error: " + e.args[0] + "\n"
         usage()
 
-tag = eyeD3.Tag()
+
 if __name__ == "__main__":
     main(sys.argv[1:])
